@@ -7,10 +7,10 @@ using UnityEngine.UIElements;
 public class PyMatrix : EditorWindow
 {
     [MenuItem("Window/UI Toolkit/PyMatrix")]
-    public static void ShowPyGrid()
+    public static void ShowPyMatrix()
     {
         PyMatrix wnd = GetWindow<PyMatrix>();
-        wnd.titleContent = new GUIContent("PyGrid");
+        wnd.titleContent = new GUIContent("PyMatrix");
     }
 
     private const int MaxDimensionValue = 100;
@@ -72,8 +72,8 @@ public class PyMatrix : EditorWindow
 
         var createCubePlane = new Button()
         {
-            name = "createGridBoundary",
-            text = "Add grid boundary"
+            name = "createMatrixBoundary",
+            text = "Add matrix boundary"
         };
         root.Add(createCubePlane);
         
@@ -84,7 +84,7 @@ public class PyMatrix : EditorWindow
         var selectPath = new Button()
         {
             name = "selectPath",
-            text = "Select path where grid will be stored"
+            text = "Select path where matrix will be stored"
         };
         root.Add(selectPath);
         
@@ -121,9 +121,9 @@ public class PyMatrix : EditorWindow
 
     private void RegisterHandler(Button button)
     {
-        if (button.name == "createGridBoundary")
+        if (button.name == "createMatrixBoundary")
         {
-            button.RegisterCallback<ClickEvent>(CreateGridBoundary);
+            button.RegisterCallback<ClickEvent>(CreateMatrixBoundary);
             button.RegisterCallback<ClickEvent>(CreateInnerObstaclePreview);
         }
 
@@ -140,7 +140,7 @@ public class PyMatrix : EditorWindow
 
     private void SelectPath(ClickEvent evt)
     {
-        Path = EditorUtility.OpenFolderPanel("Select path to store Grid in", "~/", "");
+        Path = EditorUtility.OpenFolderPanel("Select path to store Matrix in", "~/", "");
         Debug.Log(Path);
     }
 
@@ -152,22 +152,22 @@ public class PyMatrix : EditorWindow
             Debug.Log("Empty filename");
             return;
         }
-        string pythonGridSet = "Grid = {";
+        string pythonMatrixSet = "Matrix = {";
         
         foreach (Transform childTransform in _innerBoundaries.transform)
         {
             if (childTransform.CompareTag("innerBoundaryCube"))
             {
-                pythonGridSet += "(" + (int)(childTransform.position.x / 1.5) + "," +
+                pythonMatrixSet += "(" + (int)(childTransform.position.x / 1.5) + "," +
                                     (int)(childTransform.position.y / 1.5) + "," +
                                     (int)(childTransform.position.z / 1.5) + "), ";  
             }
             
         }
-        pythonGridSet = pythonGridSet.Remove(pythonGridSet.Length - 2, 2);
-        pythonGridSet += "}";
+        pythonMatrixSet = pythonMatrixSet.Remove(pythonMatrixSet.Length - 2, 2);
+        pythonMatrixSet += "}";
             
-        File.WriteAllText(_path + _filename, pythonGridSet);
+        File.WriteAllText(_path + _filename, pythonMatrixSet);
     }
 
     private void CreateInnerObstaclePreview(ClickEvent evt)
@@ -197,7 +197,7 @@ public class PyMatrix : EditorWindow
         
     }
     
-    private void CreateGridBoundary(ClickEvent evt)
+    private void CreateMatrixBoundary(ClickEvent evt)
     {
         var root = rootVisualElement;
         
