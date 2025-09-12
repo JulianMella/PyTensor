@@ -4,12 +4,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PyGrid : EditorWindow
+public class PyMatrix : EditorWindow
 {
-    [MenuItem("Window/UI Toolkit/PyGrid")]
+    [MenuItem("Window/UI Toolkit/PyMatrix")]
     public static void ShowPyGrid()
     {
-        PyGrid wnd = GetWindow<PyGrid>();
+        PyMatrix wnd = GetWindow<PyMatrix>();
         wnd.titleContent = new GUIContent("PyGrid");
     }
 
