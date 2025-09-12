@@ -70,6 +70,21 @@ public class PyMatrix : EditorWindow
         
         root.Add(lengthField);
 
+        var heightField = new UnsignedIntegerField()
+        {
+            label = "Enter height of matrix: ",
+            name = "heightField",
+            value = 1
+        };
+
+        heightField.RegisterValueChangedCallback((v) =>
+        {
+            if (v.newValue > MaxDimensionValue) heightField.value = MaxDimensionValue;
+            else if (v.newValue < 1) heightField.value = 1;
+        });
+        
+        root.Add(heightField);
+        
         var createCubePlane = new Button()
         {
             name = "createMatrixBoundary",
