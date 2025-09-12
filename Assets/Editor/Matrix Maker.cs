@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Codice.Client.BaseCommands;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,7 +17,7 @@ public class PyMatrix : EditorWindow
     private const int MaxDimensionValue = 100;
 
     private readonly List<GameObject> _cubePlaneObjects = new();
-    private GameObject _boundaryEdges = null;
+    private GameObject _matrixFloor = null;
     private GameObject _innerBoundaries = null;
     private string _path = "";
     private string _filename = "";
@@ -138,7 +139,7 @@ public class PyMatrix : EditorWindow
     {
         if (button.name == "createMatrixBoundary")
         {
-            button.RegisterCallback<ClickEvent>(CreateMatrixBoundary);
+            button.RegisterCallback<ClickEvent>(CreateMatrixFloor);
             button.RegisterCallback<ClickEvent>(CreateInnerObstaclePreview);
         }
 
@@ -212,42 +213,28 @@ public class PyMatrix : EditorWindow
         
     }
     
-    private void CreateMatrixBoundary(ClickEvent evt)
+    private void CreateMatrixFloor(ClickEvent evt)
     {
         var root = rootVisualElement;
         
         var width = root.Q<UnsignedIntegerField>("widthField").value;
         var length = root.Q<UnsignedIntegerField>("lengthField").value;
+        var amountOfSpheres = (x: width - 2, z: length - 2);
         
-        if (_boundaryEdges != null)
-        {   
-            Destroy(_boundaryEdges);
-        }
-        
-        _boundaryEdges = new GameObject("boundaryGroup");
-        
-        for (int x = 0; x < width; x++)
+        // if matrix floor dimensions are different, destroy and create new, otherwise return.
+        if (_matrixFloor != null)
         {
-            var topEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            topEdge.transform.position = new Vector3(x * 1.5f, 0, 0);
-            topEdge.transform.SetParent(_boundaryEdges.transform);
-            
-            var bottomEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bottomEdge.transform.position = new Vector3(x * 1.5f, 0, (length - 1) * 1.5f);
-            bottomEdge.transform.SetParent(_boundaryEdges.transform);
-        }
-        
-        for (int z = 1; z < length - 1; z++)
-        {
-            var leftEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            leftEdge.transform.position = new Vector3(0, 0, z * 1.5f);
-            leftEdge.transform.SetParent(_boundaryEdges.transform);
-            
-            var rightEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            rightEdge.transform.position = new Vector3((width - 1) * 1.5f, 0, z * 1.5f);
-            rightEdge.transform.SetParent(_boundaryEdges.transform);
-        }
+            if (_matrixFloor.transform.localScale.x == width && _matrixFloor.transform.localScale.y == length)
+            {
+                return;
+            }
 
+            Destroy(_matrixFloor);
+        }
+        _matrixFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        _matrixFloor.name = "MatrixFloor";
+        _matrixFloor.transform.localScale = new Vector3(width * 1.5f, 2, length * 1.5f);
+        _matrixFloor.transform.position = new Vector3(((amountOfSpheres.x * 1.5f) + 1.5f) / 2, -2, ((amountOfSpheres.z * 1.5f) + 1.5f) / 2);
     }
 
     private void ActivateExportButton()
