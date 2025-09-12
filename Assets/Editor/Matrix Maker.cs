@@ -43,7 +43,7 @@ public class PyMatrix : EditorWindow
 
         var widthField = new UnsignedIntegerField()
         {
-            label = "Enter width of plane: ",
+            label = "Enter width of matrix: ",
             name = "widthField",
             value = 1,
         };
@@ -55,20 +55,20 @@ public class PyMatrix : EditorWindow
         
         root.Add(widthField);
         
-        var heightField = new UnsignedIntegerField()
+        var lengthField = new UnsignedIntegerField()
         {
-            label = "Enter height of plane: ",
-            name = "heightField",
+            label = "Enter length of matrix: ",
+            name = "lengthField",
             value = 1
         };
 
-        heightField.RegisterValueChangedCallback((v) =>
+        lengthField.RegisterValueChangedCallback((v) =>
         {
-            if (v.newValue > MaxDimensionValue) heightField.value = MaxDimensionValue;
-            else if (v.newValue < 1)  heightField.value = 1;
+            if (v.newValue > MaxDimensionValue) lengthField.value = MaxDimensionValue;
+            else if (v.newValue < 1)  lengthField.value = 1;
         });
         
-        root.Add(heightField);
+        root.Add(lengthField);
 
         var createCubePlane = new Button()
         {
@@ -175,7 +175,7 @@ public class PyMatrix : EditorWindow
         var root = rootVisualElement;
         
         var width = root.Q<UnsignedIntegerField>("widthField").value;
-        var height = root.Q<UnsignedIntegerField>("heightField").value;
+        var length = root.Q<UnsignedIntegerField>("lengthField").value;
         
         if (_innerBoundaries != null)
         {
@@ -186,7 +186,7 @@ public class PyMatrix : EditorWindow
 
         for (var x = 1; x < width - 1; x++)
         {
-            for (var z = 1; z < height - 1; z++)
+            for (var z = 1; z < length - 1; z++)
             {
                 var innerBoundary = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 innerBoundary.transform.position =  new Vector3(x * 1.5f, 0, z * 1.5f);
@@ -202,7 +202,7 @@ public class PyMatrix : EditorWindow
         var root = rootVisualElement;
         
         var width = root.Q<UnsignedIntegerField>("widthField").value;
-        var height = root.Q<UnsignedIntegerField>("heightField").value;
+        var length = root.Q<UnsignedIntegerField>("lengthField").value;
         
         if (_boundaryEdges != null)
         {   
@@ -218,11 +218,11 @@ public class PyMatrix : EditorWindow
             topEdge.transform.SetParent(_boundaryEdges.transform);
             
             var bottomEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bottomEdge.transform.position = new Vector3(x * 1.5f, 0, (height - 1) * 1.5f);
+            bottomEdge.transform.position = new Vector3(x * 1.5f, 0, (length - 1) * 1.5f);
             bottomEdge.transform.SetParent(_boundaryEdges.transform);
         }
         
-        for (int z = 1; z < height - 1; z++)
+        for (int z = 1; z < length - 1; z++)
         {
             var leftEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
             leftEdge.transform.position = new Vector3(0, 0, z * 1.5f);
