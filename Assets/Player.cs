@@ -1,9 +1,15 @@
+using System;
+using DefaultNamespace;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 public class Player : MonoBehaviour
 {
-    private int counterOfScrolls = 0;
+    private const int MaxInnerDimensions = MatrixConstants.MaxDimensionValue - 2; // -2 because inner boundaries remove outer walls 
+    private int _currentLayer = 1;
     
     [Header("Camera Settings")] 
     public float moveSpeed = 10f;
@@ -20,7 +26,9 @@ public class Player : MonoBehaviour
 
     private RaycastHit _hit;
     private Ray _ray;
-
+    
+    private GameObject _matrix;
+    
     [SerializeField] private Camera cam;
     [Header("Sphere Hover Color Settings")]
     [SerializeField] private Material defaultMat;
@@ -29,6 +37,16 @@ public class Player : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         cam = GetComponent<Camera>();
+    }
+
+    void OnEnable() => MatrixSpawner.OnMatrixSpawned += HandleMatrixSpawned;
+    void OnDisable() => MatrixSpawner.OnMatrixSpawned -= HandleMatrixSpawned;
+
+    void HandleMatrixSpawned(GameObject matrix)
+    {
+        _matrix = matrix;
+        Debug.Log("Got matrix!");
+        Debug.Log(_matrix.transform.childCount);
     }
     
     void OnMove(InputValue value)
@@ -47,14 +65,28 @@ public class Player : MonoBehaviour
 
         if (scrollDelta.y > 0)
         {
-            counterOfScrolls--;
-            Debug.Log("Scroll up: " + counterOfScrolls);
+            _currentLayer--;
         }
         else if (scrollDelta.y < 0)
         {
-            counterOfScrolls++;
-            Debug.Log("Scroll down: " + counterOfScrolls);
+            _currentLayer++;
         }
+
+        if (_currentLayer < 1)
+        {
+            _currentLayer = MaxInnerDimensions;
+        }
+
+        if (_currentLayer > MaxInnerDimensions)
+        {
+            _currentLayer = 1;
+        }
+
+        ShowLayer(_currentLayer);
+    }
+
+    private void ShowLayer(int layer)
+    {
     }
     
 

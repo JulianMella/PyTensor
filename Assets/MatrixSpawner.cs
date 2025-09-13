@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 
 public class MatrixSpawner : MonoBehaviour
 {
+    public static event Action<GameObject> OnMatrixSpawned;
     private GameObject _matrixFloor = null;
     private GameObject _innerBoundaries = null;
     private const float SpacingBetweenSpheres = 1.5f;
@@ -11,8 +13,10 @@ public class MatrixSpawner : MonoBehaviour
 
         if (_matrixFloor != null)
         {
-            Renderer matrixComponent = _matrixFloor.GetComponent<Renderer>();
-            if (matrixComponent.bounds.size.x == width * SpacingBetweenSpheres && matrixComponent.bounds.size.z == length * SpacingBetweenSpheres)
+            Renderer matrixFloorComponent = _matrixFloor.GetComponent<Renderer>();
+            if (matrixFloorComponent.bounds.size.x == width * SpacingBetweenSpheres && 
+                matrixFloorComponent.bounds.size.z == length * SpacingBetweenSpheres && 
+                _innerBoundaries.transform.childCount == height)
             {
                 Debug.Log("Already exists with given parameters!");
                 return null;
@@ -21,7 +25,7 @@ public class MatrixSpawner : MonoBehaviour
         
         SpawnFloorBelowMatrix(width, length);
         SpawnSphereMatrix(width, length, height);
-
+        OnMatrixSpawned?.Invoke(_innerBoundaries);
         return _innerBoundaries;
     }
 
