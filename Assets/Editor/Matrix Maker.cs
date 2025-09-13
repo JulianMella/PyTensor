@@ -15,6 +15,7 @@ public class PyMatrix : EditorWindow
     }
 
     private const int MaxDimensionValue = 100;
+    private const float SpacingBetweenSpheres = 1.5f;
 
     private readonly List<GameObject> _cubePlaneObjects = new();
     private GameObject _matrixFloor = null;
@@ -204,7 +205,7 @@ public class PyMatrix : EditorWindow
 
         if (_matrixFloor != null)
         {
-            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * 1.5f && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * 1.5f)
+            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * SpacingBetweenSpheres && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * SpacingBetweenSpheres)
             {
                 Debug.Log("Already created!");
                 return;
@@ -226,7 +227,7 @@ public class PyMatrix : EditorWindow
                 for (var z = 1; z < length - 1; z++)
                 {
                     var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position =  new Vector3(x * 1.5f, (y - 1) * 1.5f, z * 1.5f);
+                    sphere.transform.position =  new Vector3(x * SpacingBetweenSpheres, (y - 1) * SpacingBetweenSpheres, z * SpacingBetweenSpheres);
                     sphere.transform.SetParent(layer.transform);
                     sphere.tag = "innerBoundarySphere";
                 }
@@ -247,7 +248,7 @@ public class PyMatrix : EditorWindow
         // if matrix floor dimensions are different, destroy and create new, otherwise return.
         if (_matrixFloor != null)
         {
-            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * 1.5f && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * 1.5f)
+            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * SpacingBetweenSpheres && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * SpacingBetweenSpheres)
             {
                 Debug.Log("Already created!");
                 return;
@@ -257,8 +258,8 @@ public class PyMatrix : EditorWindow
         }
         _matrixFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
         _matrixFloor.name = "MatrixFloor";
-        _matrixFloor.transform.localScale = new Vector3(width * 1.5f, 2, length * 1.5f);
-        _matrixFloor.transform.position = new Vector3(((amountOfSpheres.x * 1.5f) + 1.5f) / 2, -2, ((amountOfSpheres.z * 1.5f) + 1.5f) / 2);
+        _matrixFloor.transform.localScale = new Vector3(width * SpacingBetweenSpheres, 2, length * SpacingBetweenSpheres);
+        _matrixFloor.transform.position = new Vector3(((amountOfSpheres.x * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2, -2, ((amountOfSpheres.z * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2);
     }
 
     private void ActivateExportButton()
