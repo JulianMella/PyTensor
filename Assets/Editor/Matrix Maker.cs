@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,14 +15,10 @@ public class PyMatrix : EditorWindow
         wnd.titleContent = new GUIContent("PyMatrix");
     }
 
-    private const int MaxDimensionValue = 100;
-    private const float SpacingBetweenSpheres = 1.5f;
-
-    private readonly List<GameObject> _cubePlaneObjects = new();
-    private GameObject _matrixFloor = null;
-    private GameObject _innerBoundaries = null;
+    private const int MaxDimensionValue = MatrixConstants.MaxDimensionValue;
     private string _path = "";
     private string _filename = "";
+    private GameObject _innerBoundaries = null;
 
     public string Path
     {
@@ -146,8 +143,7 @@ public class PyMatrix : EditorWindow
     {
         if (button.name == "createMatrixBoundary")
         {
-            button.RegisterCallback<ClickEvent>(CreateInnerObstaclePreview);
-            button.RegisterCallback<ClickEvent>(CreateMatrixFloor);
+            button.RegisterCallback<ClickEvent>(CallMatrixSpawner);
         }
 
         if (button.name == "exportToPythonSet")
@@ -195,72 +191,25 @@ public class PyMatrix : EditorWindow
         File.WriteAllText(_path + _filename, pythonMatrixSet);
     }
 
-    private void CreateInnerObstaclePreview(ClickEvent evt)
+    private void CallMatrixSpawner(ClickEvent evt)
     {
-        var root = rootVisualElement;
-        
-        var width = root.Q<UnsignedIntegerField>("widthField").value;
-        var length = root.Q<UnsignedIntegerField>("lengthField").value;
-        var height = root.Q<UnsignedIntegerField>("heightField").value;
-
-        if (_matrixFloor != null)
+        MatrixSpawner spawner = FindFirstObjectByType<MatrixSpawner>();
+        if (spawner != null)
         {
-            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * SpacingBetweenSpheres && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * SpacingBetweenSpheres)
-            {
-                Debug.Log("Already created!");
-                return;
-            }
-        }
+            var root = rootVisualElement;
         
-        if (_innerBoundaries != null)
-        {
-            Destroy(_innerBoundaries);
-        }
-        
-        _innerBoundaries = new GameObject("MatrixContainer");
-        for (var y = 1; y < height - 1; y++)
-        {
-            var layer = new GameObject("Y Matrix Layer " + y);
+            var width = root.Q<UnsignedIntegerField>("widthField").value;
+            var length = root.Q<UnsignedIntegerField>("lengthField").value;
+            var height = root.Q<UnsignedIntegerField>("heightField").value;
             
-            for (var x = 1; x < width - 1; x++)
-            {
-                for (var z = 1; z < length - 1; z++)
-                {
-                    var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position =  new Vector3(x * SpacingBetweenSpheres, (y - 1) * SpacingBetweenSpheres, z * SpacingBetweenSpheres);
-                    sphere.transform.SetParent(layer.transform);
-                    sphere.tag = "innerBoundarySphere";
-                }
-            }    
-            
-            layer.transform.SetParent(_innerBoundaries.transform);
+            _innerBoundaries = spawner.SpawnMatrix(width, length, height);    
+        }
+        else
+        {
+            Debug.Log("No spawner found");
         }
     }
     
-    private void CreateMatrixFloor(ClickEvent evt)
-    {
-        var root = rootVisualElement;
-        
-        var width = root.Q<UnsignedIntegerField>("widthField").value;
-        var length = root.Q<UnsignedIntegerField>("lengthField").value;
-        var amountOfSpheres = (x: width - 2, z: length - 2);
-        
-        // if matrix floor dimensions are different, destroy and create new, otherwise return.
-        if (_matrixFloor != null)
-        {
-            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * SpacingBetweenSpheres && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * SpacingBetweenSpheres)
-            {
-                Debug.Log("Already created!");
-                return;
-            }
-
-            Destroy(_matrixFloor);
-        }
-        _matrixFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        _matrixFloor.name = "MatrixFloor";
-        _matrixFloor.transform.localScale = new Vector3(width * SpacingBetweenSpheres, 2, length * SpacingBetweenSpheres);
-        _matrixFloor.transform.position = new Vector3(((amountOfSpheres.x * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2, -2, ((amountOfSpheres.z * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2);
-    }
 
     private void ActivateExportButton()
     {
