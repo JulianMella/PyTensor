@@ -8,7 +8,7 @@ using Cursor = UnityEngine.Cursor;
 
 public class Player : MonoBehaviour
 {
-    private const int MaxInnerDimensions = MatrixConstants.MaxDimensionValue - 2; // -2 because inner boundaries remove outer walls 
+    private int _maxInnerDimensions;
     private int _currentLayer = 1;
     
     [Header("Camera Settings")] 
@@ -45,8 +45,7 @@ public class Player : MonoBehaviour
     void HandleMatrixSpawned(GameObject matrix)
     {
         _matrix = matrix;
-        Debug.Log("Got matrix!");
-        Debug.Log(_matrix.transform.childCount);
+        _maxInnerDimensions = _matrix.transform.childCount;
     }
     
     void OnMove(InputValue value)
@@ -61,25 +60,28 @@ public class Player : MonoBehaviour
 
     void OnScroll(InputValue value)
     {
+        if (_matrix == null)
+        {
+            Debug.Log("Matrix is not initialized yet");
+            return;
+        }
         Vector2 scrollDelta = value.Get<Vector2>();
 
         if (scrollDelta.y > 0)
         {
-            _currentLayer--;
+            if (_currentLayer > 0)
+            {
+                _currentLayer--;    
+                Debug.Log("Layer decrease, value now:" + _currentLayer);
+            }
         }
         else if (scrollDelta.y < 0)
         {
-            _currentLayer++;
-        }
-
-        if (_currentLayer < 1)
-        {
-            _currentLayer = MaxInnerDimensions;
-        }
-
-        if (_currentLayer > MaxInnerDimensions)
-        {
-            _currentLayer = 1;
+            if (_currentLayer < _maxInnerDimensions)
+            {
+                _currentLayer++;    
+                Debug.Log("Layer increase, value now:" + _currentLayer);
+            }
         }
 
         ShowLayer(_currentLayer);
@@ -87,8 +89,50 @@ public class Player : MonoBehaviour
 
     private void ShowLayer(int layer)
     {
+        if (layer == _maxInnerDimensions)
+        {
+            for (int i = 0; i < _maxInnerDimensions; i++)
+            {
+                Transform matrixSlice = _matrix.transform.GetChild(i); 
+                ToggleSpheresOnLayer(matrixSlice, false);
+            }
+        }
+
+        else
+        {
+            for (int i = 0; i < _maxInnerDimensions; i++)
+            {
+                Transform matrixSlice = _matrix.transform.GetChild(i); 
+                if (i > layer)
+                {
+                    // Hide everything above
+                    matrixSlice.gameObject.SetActive(false);
+                }
+                
+                else if (i < layer)
+                {
+                    matrixSlice.gameObject.SetActive(true);
+                    ToggleSpheresOnLayer(matrixSlice, false);
+                }
+                else
+                {
+                    matrixSlice.gameObject.SetActive(true);
+                    ToggleSpheresOnLayer(matrixSlice, true);
+                }
+            }
+        }
     }
-    
+
+    void ToggleSpheresOnLayer(Transform matrixSlice, bool toggle)
+    {
+        foreach (Transform transformChild in matrixSlice)
+        {
+            if (transformChild.CompareTag("innerBoundarySphere"))
+            {
+                transformChild.gameObject.SetActive(toggle);
+            }
+        }
+    }
 
     void OnLeftClick(InputValue value)
     {
