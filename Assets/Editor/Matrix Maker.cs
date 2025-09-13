@@ -210,7 +210,6 @@ public class PyMatrix : EditorWindow
         }
     }
     
-
     private void ActivateExportButton()
     {
         if (_path == "")
