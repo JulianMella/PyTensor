@@ -1,7 +1,7 @@
 namespace DefaultNamespace
 {
-    public class MatrisConstants
+    public class MatrixConstants
     {
-        
+        public const int MaxDimensionValue = 100;
     }
 }
