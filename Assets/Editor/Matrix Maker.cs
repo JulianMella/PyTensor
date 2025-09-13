@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using Codice.Client.BaseCommands;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -93,8 +92,14 @@ public class PyMatrix : EditorWindow
         };
         root.Add(createCubePlane);
         
-        var spacer = new VisualElement();
-        spacer.style.height = 20;
+        var spacer = new VisualElement
+        {
+            style =
+            {
+                height = 20
+            }
+        };
+        
         root.Add(spacer);
 
         var selectPath = new Button()
@@ -139,8 +144,8 @@ public class PyMatrix : EditorWindow
     {
         if (button.name == "createMatrixBoundary")
         {
-            button.RegisterCallback<ClickEvent>(CreateMatrixFloor);
             button.RegisterCallback<ClickEvent>(CreateInnerObstaclePreview);
+            button.RegisterCallback<ClickEvent>(CreateMatrixFloor);
         }
 
         if (button.name == "exportToPythonSet")
@@ -192,25 +197,40 @@ public class PyMatrix : EditorWindow
         
         var width = root.Q<UnsignedIntegerField>("widthField").value;
         var length = root.Q<UnsignedIntegerField>("lengthField").value;
+        var height = root.Q<UnsignedIntegerField>("heightField").value;
+
+        if (_matrixFloor != null)
+        {
+            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * 1.5f && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * 1.5f)
+            {
+                Debug.Log("Already created!");
+                return;
+            }
+        }
         
         if (_innerBoundaries != null)
         {
             Destroy(_innerBoundaries);
         }
         
-        _innerBoundaries = new GameObject("InnerBoundaryGroup");
-
-        for (var x = 1; x < width - 1; x++)
+        _innerBoundaries = new GameObject("MatrixContainer");
+        for (var y = 1; y < height - 1; y++)
         {
-            for (var z = 1; z < length - 1; z++)
+            var layer = new GameObject("Y Matrix Layer " + y);
+            
+            for (var x = 1; x < width - 1; x++)
             {
-                var innerBoundary = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                innerBoundary.transform.position =  new Vector3(x * 1.5f, 0, z * 1.5f);
-                innerBoundary.transform.SetParent(_innerBoundaries.transform);
-                innerBoundary.tag = "innerBoundarySphere";
-            }
+                for (var z = 1; z < length - 1; z++)
+                {
+                    var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    sphere.transform.position =  new Vector3(x * 1.5f, (y - 1) * 1.5f, z * 1.5f);
+                    sphere.transform.SetParent(layer.transform);
+                    sphere.tag = "innerBoundarySphere";
+                }
+            }    
+            
+            layer.transform.SetParent(_innerBoundaries.transform);
         }
-        
     }
     
     private void CreateMatrixFloor(ClickEvent evt)
@@ -224,8 +244,9 @@ public class PyMatrix : EditorWindow
         // if matrix floor dimensions are different, destroy and create new, otherwise return.
         if (_matrixFloor != null)
         {
-            if (_matrixFloor.transform.localScale.x == width && _matrixFloor.transform.localScale.y == length)
+            if (_matrixFloor.GetComponent<Renderer>().bounds.size.x == width * 1.5f && _matrixFloor.GetComponent<Renderer>().bounds.size.z == length * 1.5f)
             {
+                Debug.Log("Already created!");
                 return;
             }
 
