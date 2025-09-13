@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    private int counterOfScrolls = 0;
+    
     [Header("Camera Settings")] 
     public float moveSpeed = 10f;
     public float lookSensitivity = 1f;
@@ -38,6 +40,23 @@ public class Player : MonoBehaviour
     {
         _rotationInput = value.Get<Vector2>();
     }
+
+    void OnScroll(InputValue value)
+    {
+        Vector2 scrollDelta = value.Get<Vector2>();
+
+        if (scrollDelta.y > 0)
+        {
+            counterOfScrolls--;
+            Debug.Log("Scroll up: " + counterOfScrolls);
+        }
+        else if (scrollDelta.y < 0)
+        {
+            counterOfScrolls++;
+            Debug.Log("Scroll down: " + counterOfScrolls);
+        }
+    }
+    
 
     void OnLeftClick(InputValue value)
     {
