@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -174,16 +175,18 @@ public class PyMatrix : EditorWindow
             return;
         }
         string pythonMatrixSet = "Matrix = {";
-        
-        foreach (Transform childTransform in _innerBoundaries.transform)
+
+        foreach (Transform transformLayerChild in _innerBoundaries.transform)
         {
-            if (childTransform.CompareTag("innerBoundaryCube"))
+            foreach (Transform boundaryChild in transformLayerChild)
             {
-                pythonMatrixSet += "(" + (int)(childTransform.position.x / 1.5) + "," +
-                                    (int)(childTransform.position.y / 1.5) + "," +
-                                    (int)(childTransform.position.z / 1.5) + "), ";  
+                if (boundaryChild.CompareTag("innerBoundaryCube"))
+                {
+                    pythonMatrixSet += "(" + (int)(boundaryChild.position.x / 1.5) + "," +
+                                        (int)((boundaryChild.position.y / 1.5) + 1) + "," +
+                                        (int)(boundaryChild.position.z / 1.5) + "), ";  
+                }
             }
-            
         }
         pythonMatrixSet = pythonMatrixSet.Remove(pythonMatrixSet.Length - 2, 2);
         pythonMatrixSet += "}";
