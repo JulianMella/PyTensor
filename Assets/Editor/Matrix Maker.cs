@@ -1,21 +1,19 @@
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using DefaultNamespace;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PyMatrix : EditorWindow
+public class PyTensor : EditorWindow
 {
-    [MenuItem("Window/UI Toolkit/PyMatrix")]
-    public static void ShowPyMatrix()
+    [MenuItem("Window/UI Toolkit/PyTensor")]
+    public static void ShowPyTensor()
     {
-        PyMatrix wnd = GetWindow<PyMatrix>();
-        wnd.titleContent = new GUIContent("PyMatrix");
+        PyTensor wnd = GetWindow<PyTensor>();
+        wnd.titleContent = new GUIContent("PyTensor");
     }
 
-    private const int MaxDimensionValue = MatrixConstants.MaxDimensionValue;
+    private const uint MaxDimensionValue = MatrixConstants.MaxDimensionValue;
     private string _path = "";
     private string _filename = "";
     private GameObject _innerBoundaries = null;
@@ -42,7 +40,7 @@ public class PyMatrix : EditorWindow
 
         var widthField = new UnsignedIntegerField()
         {
-            label = "Enter width of matrix: ",
+            label = "Enter width: ",
             name = "widthField",
             value = 1,
         };
@@ -56,7 +54,7 @@ public class PyMatrix : EditorWindow
         
         var lengthField = new UnsignedIntegerField()
         {
-            label = "Enter length of matrix: ",
+            label = "Enter length: ",
             name = "lengthField",
             value = 1
         };
@@ -71,7 +69,7 @@ public class PyMatrix : EditorWindow
 
         var heightField = new UnsignedIntegerField()
         {
-            label = "Enter height of matrix: ",
+            label = "Enter height: ",
             name = "heightField",
             value = 1
         };
@@ -87,7 +85,7 @@ public class PyMatrix : EditorWindow
         var createCubePlane = new Button()
         {
             name = "createMatrixBoundary",
-            text = "Add matrix boundary"
+            text = "Add boundary"
         };
         root.Add(createCubePlane);
         
@@ -104,7 +102,7 @@ public class PyMatrix : EditorWindow
         var selectPath = new Button()
         {
             name = "selectPath",
-            text = "Select path where matrix will be stored"
+            text = "Select path where boundaries will be stored"
         };
         root.Add(selectPath);
         
