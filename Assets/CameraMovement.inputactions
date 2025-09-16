@@ -34,13 +34,22 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Press",
+                    "name": "LeftPress",
                     "type": "Value",
                     "id": "d1adcd2f-e5e0-42a2-84ef-363cee44d29c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "RightPress",
+                    "type": "Button",
+                    "id": "ab0dfdb1-fc69-45a7-b324-c02db55f0faa",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -150,7 +159,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Press",
+                    "action": "LeftPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5b09971e-1c30-4520-b2eb-61b4126a2c60",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightPress",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
