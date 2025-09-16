@@ -6,8 +6,9 @@ public class Player : MonoBehaviour
     private int _maxInnerDimensions;
     private int _currentLayer = 1;
     private bool _leftMouseIsPressed;
+    private bool _radiusMode = false;
 
-    private int _objectSelected = 0;
+    private int _objectSelected;
     
     [Header("Camera Settings")] 
     public float moveSpeed = 10f;
@@ -32,6 +33,7 @@ public class Player : MonoBehaviour
     [Header("Sphere Hover Color Settings")]
     [SerializeField] private Material defaultMat;
     [SerializeField] private Material highlightMat;
+    [SerializeField] private Material radiusModeHighlightMat;
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -67,13 +69,43 @@ public class Player : MonoBehaviour
         _matrix = matrix;
         _maxInnerDimensions = _matrix.transform.childCount;
     }
-    
-    void OnPress(InputValue value)
+
+    private void OnRightPress(InputValue value)
     {
-        Debug.Log("XD?");
+        _radiusMode = !_radiusMode;
+        if (_radiusMode)
+        {
+            Debug.Log("Radius Mode Activated");
+        }
+        else
+        {
+            Debug.Log("Builder Mode Activated");
+        }
+    }
+    
+    private void OnLeftPress(InputValue value)
+    {
         _leftMouseIsPressed = value.isPressed;
-        if (!_leftMouseIsPressed)
-            _objectSelected = 0;
+        if (_radiusMode  && _leftMouseIsPressed)
+        {
+            ShootRay();
+        }
+        else if (!_radiusMode)
+        {
+            
+            // TODO: Figure out how to allow a short timed left click to only change one cube and only modify multiple if the click last lost enough???
+            // The problem here is that press and release are two separate function calls, where release comes after press.
+            // Essentially, what I need to do is to add a countdown timer in the press function 
+            // Where if _leftMouseIsPressed is still true after that period, then it will allow for multiple edits based 
+            // upon that left click
+        
+            // IDK, unreasonably hard to figure this one out simply, will come back to look at this eventually
+        
+            if (!_leftMouseIsPressed)
+            {
+                _objectSelected = 0;
+            }
+        }
     }
 
     void OnScroll(InputValue value)
@@ -161,44 +193,12 @@ public class Player : MonoBehaviour
         HandleRotation();
         HandleRaycastHover();
     }
-
+    
     private void HandleLeftClick()
     {
-        if (_leftMouseIsPressed)
+        if (_leftMouseIsPressed && !_radiusMode)
         {
-            _ray = cam.ScreenPointToRay(_screenCenter);
-
-            if (Physics.Raycast(_ray, out _hit))
-            {
-                if (_objectSelected == 0)
-                {
-                    if (_hit.transform.CompareTag("innerBoundarySphere"))
-                        _objectSelected = 1;
-                    else if (_hit.transform.CompareTag("innerBoundaryCube"))
-                        _objectSelected = 2;
-                }
-                if (_objectSelected == 1 && _hit.transform.CompareTag("innerBoundarySphere"))
-                {
-                    var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cube.transform.position = _hit.transform.position;
-                    cube.transform.rotation = _hit.transform.rotation;
-                    cube.transform.parent = _hit.transform.parent;
-                    cube.transform.localScale = _hit.transform.localScale;
-                    cube.transform.tag = "innerBoundaryCube";
-                    Destroy(_hit.transform.gameObject);
-                }
-            
-                else if (_objectSelected == 2 && _hit.transform.CompareTag("innerBoundaryCube"))
-                {
-                    var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position = _hit.transform.position;
-                    sphere.transform.rotation = _hit.transform.rotation;
-                    sphere.transform.parent = _hit.transform.parent;
-                    sphere.transform.localScale = _hit.transform.localScale;
-                    sphere.transform.tag = "innerBoundarySphere";
-                    Destroy(_hit.transform.gameObject);
-                }
-            }
+            ShootRay();
         }
 
     }
@@ -225,13 +225,23 @@ public class Player : MonoBehaviour
             if (_hit.transform.CompareTag("innerBoundarySphere") || _hit.transform.CompareTag("innerBoundaryCube"))
             {
                 _objectHit = _hit.transform;
-                SetHighlight(_objectHit);
+
+                if (_hit.transform.CompareTag("innerBoundarySphere"))
+                {
+                    SetHighlight(_objectHit, _radiusMode);
+                }
+
+                if (_hit.transform.CompareTag("innerBoundaryCube"))
+                {
+                    SetHighlight(_objectHit, false);
+                }
             }
 
         }
 
         else
         {
+            // TODO: Confirm this is necessary
             if (_objectHit != null)
             {
                 ResetColor(_objectHit);
@@ -245,9 +255,16 @@ public class Player : MonoBehaviour
         objectHit.GetComponent<Renderer>().material = defaultMat;
     }
 
-    private void SetHighlight(Transform objectHit)
+    private void SetHighlight(Transform objectHit, bool radiusMode)
     {
-        objectHit.GetComponent<Renderer>().material = highlightMat;
+        if (radiusMode)
+        {
+            objectHit.GetComponent<Renderer>().material = radiusModeHighlightMat;
+        }
+        else
+        {
+            objectHit.GetComponent<Renderer>().material = highlightMat;
+        }
     }
 
     private void HandleMovement(float deltaTime)
@@ -262,5 +279,51 @@ public class Player : MonoBehaviour
         _currentRotation += _rotationInput * lookSensitivity;
         _currentRotation.y = Mathf.Clamp(_currentRotation.y, -90f, 90f); // prevent flipping
         transform.rotation = Quaternion.Euler(-_currentRotation.y, _currentRotation.x, 0);
+    }
+
+    private void ShootRay()
+    {
+        _ray = cam.ScreenPointToRay(_screenCenter);
+
+        if (Physics.Raycast(_ray, out _hit))
+        {
+            if (_radiusMode && _hit.transform.CompareTag("innerBoundarySphere"))
+            {
+                
+            }
+
+            else
+            {
+                
+                if (_objectSelected == 0)
+                {
+                    if (_hit.transform.CompareTag("innerBoundarySphere"))
+                        _objectSelected = 1;
+                    else if (_hit.transform.CompareTag("innerBoundaryCube"))
+                        _objectSelected = 2;
+                }
+                if (_objectSelected == 1 && _hit.transform.CompareTag("innerBoundarySphere"))
+                {
+                    var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    cube.transform.position = _hit.transform.position;
+                    cube.transform.rotation = _hit.transform.rotation;
+                    cube.transform.parent = _hit.transform.parent;
+                    cube.transform.localScale = _hit.transform.localScale;
+                    cube.transform.tag = "innerBoundaryCube";
+                    Destroy(_hit.transform.gameObject);
+                }
+                
+                else if (_objectSelected == 2 && _hit.transform.CompareTag("innerBoundaryCube"))
+                {
+                    var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    sphere.transform.position = _hit.transform.position;
+                    sphere.transform.rotation = _hit.transform.rotation;
+                    sphere.transform.parent = _hit.transform.parent;
+                    sphere.transform.localScale = _hit.transform.localScale;
+                    sphere.transform.tag = "innerBoundarySphere";
+                    Destroy(_hit.transform.gameObject);
+                }
+            }
+        }
     }
 }
