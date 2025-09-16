@@ -35,12 +35,12 @@
                 },
                 {
                     "name": "Press",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "d1adcd2f-e5e0-42a2-84ef-363cee44d29c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [

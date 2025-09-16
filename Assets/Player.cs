@@ -58,7 +58,6 @@ public class Player : MonoBehaviour
     void OnPress(InputValue value)
     {
         _leftMouseIsPressed = value.isPressed;
-
         if (!_leftMouseIsPressed)
             _objectSelected = 0;
     }
