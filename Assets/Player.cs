@@ -18,8 +18,9 @@ public class Player : MonoBehaviour
 
     private Vector2 _currentRotation;
     private Vector2 _rotationVelocity;
-    
-    private readonly Vector3 _screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+    private int _screenWidth;
+    private int _screenHeight;
+    private Vector3 _screenCenter;
     private Transform _objectHit;
 
     private RaycastHit _hit;
@@ -35,6 +36,18 @@ public class Player : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         cam = GetComponent<Camera>();
+    }
+
+    void Start()
+    {
+        UpdateScreenCenter(); // This must be called in Start because it depends on Screen.width and Screen.height, which is not guaranteed to be initialized in Awake()
+    }
+
+    private void UpdateScreenCenter()
+    {
+        _screenHeight = Screen.height;
+        _screenWidth = Screen.width;
+        _screenCenter = new Vector3(_screenWidth / 2f, _screenHeight / 2f, 0f);
     }
     
     void OnMove(InputValue value)
@@ -57,6 +70,7 @@ public class Player : MonoBehaviour
     
     void OnPress(InputValue value)
     {
+        Debug.Log("XD?");
         _leftMouseIsPressed = value.isPressed;
         if (!_leftMouseIsPressed)
             _objectSelected = 0;
@@ -140,6 +154,16 @@ public class Player : MonoBehaviour
     
     void Update()
     {
+        float currDeltaTime = Time.deltaTime;
+        HandleLeftClick();
+        HandleScreenCenter();
+        HandleMovement(currDeltaTime);
+        HandleRotation();
+        HandleRaycastHover();
+    }
+
+    private void HandleLeftClick()
+    {
         if (_leftMouseIsPressed)
         {
             _ray = cam.ScreenPointToRay(_screenCenter);
@@ -176,11 +200,15 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        
-        float currDeltaTime = Time.deltaTime;
-        HandleMovement(currDeltaTime);
-        HandleRotation();
-        HandleRaycastHover();
+
+    }
+    
+    private void HandleScreenCenter()
+    {
+        if (_screenWidth != Screen.width || _screenHeight != Screen.height)
+        {
+            UpdateScreenCenter();
+        }
     }
 
     private void HandleRaycastHover()
