@@ -73,14 +73,6 @@ public class Player : MonoBehaviour
     private void OnRightPress(InputValue value)
     {
         _radiusMode = !_radiusMode;
-        if (_radiusMode)
-        {
-            Debug.Log("Radius Mode Activated");
-        }
-        else
-        {
-            Debug.Log("Builder Mode Activated");
-        }
     }
     
     private void OnLeftPress(InputValue value)
