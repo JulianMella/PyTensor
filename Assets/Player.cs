@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     private int _screenHeight;
     private Vector3 _screenCenter;
     private Transform _objectHit;
+    private Transform _radiusSphere;
 
     private RaycastHit _hit;
     private Ray _ray;
@@ -249,6 +250,10 @@ public class Player : MonoBehaviour
 
     private void ResetColor(Transform objectHit)
     {
+        if (_radiusMode && objectHit.GetComponent<Renderer>().sharedMaterial == radiusModeHighlightMat && objectHit.transform.CompareTag("radiusSphere"))
+        {
+            return;
+        }
         objectHit.GetComponent<Renderer>().material = defaultMat;
     }
 
@@ -286,8 +291,7 @@ public class Player : MonoBehaviour
         {
             if (_radiusMode && _hit.transform.CompareTag("innerBoundarySphere"))
             {
-
-                _hit.transform.GetComponent<MeshRenderer>().material = radiusModeHighlightMat;
+                HandleRadiusManipulation(_hit);
             }
 
             else
@@ -295,6 +299,20 @@ public class Player : MonoBehaviour
                 HandleBoundaryManipulation(_hit);
             }
         }
+    }
+
+    private void HandleRadiusManipulation(RaycastHit hit)
+    {
+        if (_radiusSphere != null && hit.transform != _radiusSphere)
+        {
+            _radiusSphere.GetComponent<Renderer>().material = defaultMat;
+            _radiusSphere.tag = "innerBoundarySphere";
+        }
+        
+        hit.transform.GetComponent<Renderer>().material = radiusModeHighlightMat;
+        hit.transform.tag = "radiusSphere";
+        
+        _radiusSphere = hit.transform;
     }
 
     private void HandleBoundaryManipulation(RaycastHit hit)
