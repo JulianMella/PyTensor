@@ -17,7 +17,9 @@ public class Player : MonoBehaviour
     private const int NoObjectSelected = 0;
     private const int SphereSelected = 1;
     private const int CubeSelected = 2;
-    
+
+    private bool _freezeMovement;
+    private bool _stopTime;
     
     
     [Header("Camera Settings")] 
@@ -109,8 +111,42 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Maybe it is possible to do this function in a lower level? I don't know yet.
+    void OnFreeze(InputValue value)
+    {
+        // This is cool to do, but should be refactored into its own files.
+        if (!_freezeMovement)
+        {
+            Debug.Log("Frozen movement");
+        }
+        else if (!_stopTime)
+        {
+            Debug.Log("Unfrozen movement");
+        }
+        _freezeMovement = !_freezeMovement; //TODO: Expand this to granular movement tool
+    }
+
+    void OnTimeStop(InputValue value)
+    {
+        if (!_stopTime)
+        {
+            Debug.Log("Unstopped time");
+        }
+        else
+        {
+            Debug.Log("Stopped movement");
+        }
+        _stopTime = !_stopTime;
+        _freezeMovement = false; // quick tip: assignation is faster than if check. 
+    }
+
     void OnScroll(InputValue value)
     {
+        if (_stopTime)
+        {
+            return;
+        }
+        
         if (_tensor == null)
         {
             Debug.Log("Tensor is not initialized yet");
@@ -130,8 +166,8 @@ public class Player : MonoBehaviour
                 _currentRadius--;
             }
 
-            if (scrollDelta.y < _ySliceCount) // TODO: Check if there is a better value to utilize here...?
-            {                                       // Might require some significant computation to calculate max radius of sphere from selected point
+            if (scrollDelta.y < _maxRadius)
+            {
                 _currentRadius++;
             }
         }
@@ -211,11 +247,15 @@ public class Player : MonoBehaviour
     void Update()
     {
         float currDeltaTime = Time.deltaTime;
-        HandleLeftClick();
+        if (!_stopTime)
+        {
+            HandleLeftClick();
+            HandleMovement(currDeltaTime);
+            HandleRotation();
+            HandleRaycastHover();
+        }
+        
         HandleScreenCenter();
-        HandleMovement(currDeltaTime);
-        HandleRotation();
-        HandleRaycastHover();
     }
     
     private void HandleLeftClick()
@@ -293,9 +333,12 @@ public class Player : MonoBehaviour
 
     private void HandleMovement(float deltaTime)
     {
-        Vector3 velocity = _moveInput * moveSpeed;
-        Vector3 moveAmount = velocity * deltaTime;
-        transform.Translate(moveAmount);
+        if (!_freezeMovement) // Hacky way, this can be expanded to a better suited tool.
+        {
+            Vector3 velocity = _moveInput * moveSpeed;
+            Vector3 moveAmount = velocity * deltaTime;
+            transform.Translate(moveAmount);
+        }
     }
 
     private void HandleRotation()
@@ -335,8 +378,34 @@ public class Player : MonoBehaviour
         hit.transform.tag = "radiusSphere";
         
         _radiusSphere = hit.transform;
+        
+        CalculateMaxRadius(_radiusSphere);
+        ShowAllObstacles();
+        ChangeScrollLogic();
     }
 
+    private void CalculateMaxRadius(Transform selectedSphere)
+    {
+        int xPos = _xSliceCount - (int) (selectedSphere.position.x / 1.5);
+        int xNeg = _xSliceCount - xPos - 1;
+        int yPos = _ySliceCount - (int) (selectedSphere.position.y / 1.5);
+        int yNeg = _ySliceCount - yPos - 1;
+        int zPos  = _zSliceCount - (int) (selectedSphere.position.z / 1.5);
+        int zNeg = _zSliceCount - zPos - 1;
+        
+        _maxRadius = Mathf.Max(xPos, xNeg, yPos, yNeg, zPos, zNeg);
+    }
+    
+    private void ShowAllObstacles()
+    {
+        
+    }
+
+    private void ChangeScrollLogic()
+    {
+        
+    }
+    
     private void HandleBoundaryManipulation(RaycastHit hit)
     {
         if (_objectSelected == NoObjectSelected)
