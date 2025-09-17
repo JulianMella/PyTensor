@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
         
             if (!_leftMouseIsPressed)
             {
-                _objectSelected = 0;
+                _objectSelected = NoObjectSelected;
             }
         }
     }
