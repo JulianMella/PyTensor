@@ -290,6 +290,7 @@ public class Player : MonoBehaviour
             if (_radiusMode && _hit.transform.CompareTag("innerBoundarySphere"))
             {
                 
+                _hit.transform.GetComponent<Renderer>().material = radiusModeHighlightMat;
             }
 
             else
