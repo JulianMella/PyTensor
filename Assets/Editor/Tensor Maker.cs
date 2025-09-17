@@ -13,7 +13,7 @@ public class PyTensor : EditorWindow
         wnd.titleContent = new GUIContent("PyTensor");
     }
 
-    private const uint MaxDimensionValue = MatrixConstants.MaxDimensionValue;
+    private const uint MaxDimensionValue = TensorConstants.MaxDimensionValue;
     private string _path = "";
     private string _filename = "";
     private GameObject _innerBoundaries = null;
@@ -84,7 +84,7 @@ public class PyTensor : EditorWindow
         
         var createCubePlane = new Button()
         {
-            name = "createMatrixBoundary",
+            name = "createTensorBoundary",
             text = "Add boundary"
         };
         root.Add(createCubePlane);
@@ -139,9 +139,9 @@ public class PyTensor : EditorWindow
 
     private void RegisterHandler(Button button)
     {
-        if (button.name == "createMatrixBoundary")
+        if (button.name == "createTensorBoundary")
         {
-            button.RegisterCallback<ClickEvent>(CallMatrixSpawner);
+            button.RegisterCallback<ClickEvent>(CallTensorSpawner);
         }
 
         if (button.name == "exportToPythonSet")
@@ -157,7 +157,7 @@ public class PyTensor : EditorWindow
 
     private void SelectPath(ClickEvent evt)
     {
-        Path = EditorUtility.OpenFolderPanel("Select path to store Matrix in", "~/", "");
+        Path = EditorUtility.OpenFolderPanel("Select path to store Tensor in", "~/", "");
         Debug.Log(Path);
     }
 
@@ -169,7 +169,7 @@ public class PyTensor : EditorWindow
             Debug.Log("Empty filename");
             return;
         }
-        string pythonMatrixSet = "Matrix = {";
+        string pythonTensorSet = "Tensor = {";
 
         foreach (Transform transformLayerChild in _innerBoundaries.transform)
         {
@@ -177,21 +177,21 @@ public class PyTensor : EditorWindow
             {
                 if (boundaryChild.CompareTag("innerBoundaryCube"))
                 {
-                    pythonMatrixSet += "(" + (int)(boundaryChild.position.x / 1.5) + "," +
-                                        (int)((boundaryChild.position.y / 1.5) + 1) + "," +
-                                        (int)(boundaryChild.position.z / 1.5) + "), ";  
+                    pythonTensorSet += "(" + (int)(boundaryChild.position.x / 1.5) + "," +
+                                       (int)((boundaryChild.position.y / 1.5) + 1) + "," +
+                                       (int)(boundaryChild.position.z / 1.5) + "), ";  
                 }
             }
         }
-        pythonMatrixSet = pythonMatrixSet.Remove(pythonMatrixSet.Length - 2, 2);
-        pythonMatrixSet += "}";
+        pythonTensorSet = pythonTensorSet.Remove(pythonTensorSet.Length - 2, 2);
+        pythonTensorSet += "}";
             
-        File.WriteAllText(_path + _filename, pythonMatrixSet);
+        File.WriteAllText(_path + _filename, pythonTensorSet);
     }
 
-    private void CallMatrixSpawner(ClickEvent evt)
+    private void CallTensorSpawner(ClickEvent evt)
     {
-        MatrixSpawner spawner = FindFirstObjectByType<MatrixSpawner>();
+        TensorSpawner spawner = FindFirstObjectByType<TensorSpawner>();
         if (spawner != null)
         {
             var root = rootVisualElement;
@@ -200,7 +200,7 @@ public class PyTensor : EditorWindow
             var length = root.Q<UnsignedIntegerField>("lengthField").value;
             var height = root.Q<UnsignedIntegerField>("heightField").value;
             
-            _innerBoundaries = spawner.SpawnMatrix(width, length, height);    
+            _innerBoundaries = spawner.SpawnTensor(width, length, height);    
         }
         else
         {

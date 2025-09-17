@@ -1,6 +1,6 @@
 namespace DefaultNamespace
 {
-    public class MatrixConstants
+    public class TensorConstants
     {
         public const int MaxDimensionValue = 100;
     }
