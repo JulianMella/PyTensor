@@ -9,6 +9,12 @@ public class Player : MonoBehaviour
     private bool _radiusMode = false;
 
     private int _objectSelected;
+
+    private const int NoObjectSelected = 0;
+    private const int SphereSelected = 1;
+    private const int CubeSelected = 2;
+    
+    
     
     [Header("Camera Settings")] 
     public float moveSpeed = 10f;
@@ -286,36 +292,40 @@ public class Player : MonoBehaviour
 
             else
             {
-                
-                if (_objectSelected == 0)
-                {
-                    if (_hit.transform.CompareTag("innerBoundarySphere"))
-                        _objectSelected = 1;
-                    else if (_hit.transform.CompareTag("innerBoundaryCube"))
-                        _objectSelected = 2;
-                }
-                if (_objectSelected == 1 && _hit.transform.CompareTag("innerBoundarySphere"))
-                {
-                    var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cube.transform.position = _hit.transform.position;
-                    cube.transform.rotation = _hit.transform.rotation;
-                    cube.transform.parent = _hit.transform.parent;
-                    cube.transform.localScale = _hit.transform.localScale;
-                    cube.transform.tag = "innerBoundaryCube";
-                    Destroy(_hit.transform.gameObject);
-                }
-                
-                else if (_objectSelected == 2 && _hit.transform.CompareTag("innerBoundaryCube"))
-                {
-                    var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position = _hit.transform.position;
-                    sphere.transform.rotation = _hit.transform.rotation;
-                    sphere.transform.parent = _hit.transform.parent;
-                    sphere.transform.localScale = _hit.transform.localScale;
-                    sphere.transform.tag = "innerBoundarySphere";
-                    Destroy(_hit.transform.gameObject);
-                }
+                HandleBoundaryManipulation(_hit);
             }
+        }
+    }
+
+    private void HandleBoundaryManipulation(RaycastHit hit)
+    {
+        if (_objectSelected == NoObjectSelected)
+        {
+            if (hit.transform.CompareTag("innerBoundarySphere"))
+                _objectSelected = SphereSelected;
+            else if (_hit.transform.CompareTag("innerBoundaryCube"))
+                _objectSelected = CubeSelected;
+        }
+        if (_objectSelected == SphereSelected && hit.transform.CompareTag("innerBoundarySphere"))
+        {
+            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.position = hit.transform.position;
+            cube.transform.rotation = hit.transform.rotation;
+            cube.transform.parent = hit.transform.parent;
+            cube.transform.localScale = hit.transform.localScale;
+            cube.transform.tag = "innerBoundaryCube";
+            Destroy(hit.transform.gameObject);
+        }
+                
+        else if (_objectSelected == CubeSelected && _hit.transform.CompareTag("innerBoundaryCube"))
+        {
+            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.position = hit.transform.position;
+            sphere.transform.rotation = hit.transform.rotation;
+            sphere.transform.parent = hit.transform.parent;
+            sphere.transform.localScale = hit.transform.localScale;
+            sphere.transform.tag = "innerBoundarySphere";
+            Destroy(hit.transform.gameObject);
         }
     }
 }
