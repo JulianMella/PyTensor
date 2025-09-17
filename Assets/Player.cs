@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     private int _ySliceCount;
+    private int _xSliceCount;
+    private int _zSliceCount;
     private int _currentLayer = 1;
     private bool _leftMouseIsPressed;
     private bool _radiusMode;
@@ -77,6 +79,8 @@ public class Player : MonoBehaviour
     {
         _tensor = tensor;
         _ySliceCount = tensor.transform.childCount;
+        _xSliceCount = tensor.transform.GetChild(0).childCount;
+        _zSliceCount = tensor.transform.GetChild(0).transform.GetChild(0).transform.childCount;
     }
 
     private void OnRightPress(InputValue value)

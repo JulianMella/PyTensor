@@ -14,6 +14,7 @@ public class PyTensor : EditorWindow
     }
 
     private const uint MaxDimensionValue = TensorConstants.MaxDimensionValue;
+    private const uint MinDimensionValue = TensorConstants.MinDimensionValue;
     private string _path = "";
     private string _filename = "";
     private GameObject _innerBoundaries = null;
@@ -42,12 +43,12 @@ public class PyTensor : EditorWindow
         {
             label = "Enter width: ",
             name = "widthField",
-            value = 1,
+            value = MinDimensionValue,
         };
         widthField.RegisterValueChangedCallback((v) =>
         {
             if (v.newValue > MaxDimensionValue) widthField.value = MaxDimensionValue;
-            else if (v.newValue < 1)  widthField.value = 1;
+            else if (v.newValue < MinDimensionValue)  widthField.value = MinDimensionValue;
         });
         
         root.Add(widthField);
@@ -56,13 +57,13 @@ public class PyTensor : EditorWindow
         {
             label = "Enter length: ",
             name = "lengthField",
-            value = 1
+            value = MinDimensionValue
         };
 
         lengthField.RegisterValueChangedCallback((v) =>
         {
             if (v.newValue > MaxDimensionValue) lengthField.value = MaxDimensionValue;
-            else if (v.newValue < 1)  lengthField.value = 1;
+            else if (v.newValue < MinDimensionValue)  lengthField.value = MinDimensionValue;
         });
         
         root.Add(lengthField);
@@ -71,13 +72,13 @@ public class PyTensor : EditorWindow
         {
             label = "Enter height: ",
             name = "heightField",
-            value = 1
+            value = MinDimensionValue
         };
 
         heightField.RegisterValueChangedCallback((v) =>
         {
             if (v.newValue > MaxDimensionValue) heightField.value = MaxDimensionValue;
-            else if (v.newValue < 1) heightField.value = 1;
+            else if (v.newValue < MinDimensionValue) heightField.value = MinDimensionValue;
         });
         
         root.Add(heightField);
