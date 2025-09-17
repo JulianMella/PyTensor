@@ -139,6 +139,12 @@ public class Player : MonoBehaviour
         _stopTime = !_stopTime;
         _freezeMovement = false; // quick tip: assignation is faster than if check. 
     }
+    
+    //TODO: Add Show All Spheres toggle button.
+    void OnShowEverything(InputValue value)
+    {
+        
+    }
 
     void OnScroll(InputValue value)
     {
