@@ -135,24 +135,27 @@ public class Player : MonoBehaviour
                 _currentRadius++;
             }
         }
-        if (scrollDelta.y > 0)
+        else
         {
-            if (_currentLayer > 0)
+            if (scrollDelta.y > 0)
             {
-                _currentLayer--;    
-                Debug.Log("Layer decrease, value now:" + _currentLayer);
+                if (_currentLayer > 0)
+                {
+                    _currentLayer--;
+                    Debug.Log("Layer decrease, value now:" + _currentLayer);
+                }
             }
-        }
-        else if (scrollDelta.y < 0)
-        {
-            if (_currentLayer < _ySliceCount)
+            else if (scrollDelta.y < 0)
             {
-                _currentLayer++;    
-                Debug.Log("Layer increase, value now:" + _currentLayer);
+                if (_currentLayer < _ySliceCount)
+                {
+                    _currentLayer++;
+                    Debug.Log("Layer increase, value now:" + _currentLayer);
+                }
             }
-        }
 
-        ShowLayer(_currentLayer);
+            ShowLayer(_currentLayer);
+        }
     }
 
     private void ShowLayer(int layer)
