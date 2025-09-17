@@ -78,11 +78,7 @@ public class Player : MonoBehaviour
     private void OnLeftPress(InputValue value)
     {
         _leftMouseIsPressed = value.isPressed;
-        if (_radiusMode  && _leftMouseIsPressed)
-        {
-            ShootRay();
-        }
-        else if (!_radiusMode)
+        if (!_radiusMode)
         {
             
             // TODO: Figure out how to allow a short timed left click to only change one cube and only modify multiple if the click last lost enough???
@@ -188,11 +184,10 @@ public class Player : MonoBehaviour
     
     private void HandleLeftClick()
     {
-        if (_leftMouseIsPressed && !_radiusMode)
+        if (_leftMouseIsPressed)
         {
-            ShootRay();
+            ShootRay();    
         }
-
     }
     
     private void HandleScreenCenter()
@@ -213,6 +208,11 @@ public class Player : MonoBehaviour
             {
                 ResetColor(_objectHit);
             }
+
+            if (_hit.transform.CompareTag("innerBoundaryCube") && _radiusMode)
+            {
+                ResetColor(_hit.transform);
+            }
     
             if (_hit.transform.CompareTag("innerBoundarySphere") || _hit.transform.CompareTag("innerBoundaryCube"))
             {
@@ -223,17 +223,16 @@ public class Player : MonoBehaviour
                     SetHighlight(_objectHit, _radiusMode);
                 }
 
-                if (_hit.transform.CompareTag("innerBoundaryCube"))
+                if (_hit.transform.CompareTag("innerBoundaryCube") && !_radiusMode)
                 {
                     SetHighlight(_objectHit, false);
                 }
             }
 
         }
-
+        // If ray hits nothing, remove color of last selected
         else
         {
-            // TODO: Confirm this is necessary
             if (_objectHit != null)
             {
                 ResetColor(_objectHit);
@@ -281,8 +280,8 @@ public class Player : MonoBehaviour
         {
             if (_radiusMode && _hit.transform.CompareTag("innerBoundarySphere"))
             {
-                
-                _hit.transform.GetComponent<Renderer>().material = radiusModeHighlightMat;
+
+                _hit.transform.GetComponent<MeshRenderer>().material = radiusModeHighlightMat;
             }
 
             else
