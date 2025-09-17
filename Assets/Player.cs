@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private int _maxInnerDimensions;
+    private int _ySliceCount;
     private int _currentLayer = 1;
     private bool _leftMouseIsPressed;
     private bool _radiusMode = false;
@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     private RaycastHit _hit;
     private Ray _ray;
 
-    private GameObject _matrix;
+    private GameObject _tensor;
 
     [SerializeField] private Camera cam;
     [Header("Sphere Hover Color Settings")]
@@ -71,12 +71,12 @@ public class Player : MonoBehaviour
         _rotationInput = value.Get<Vector2>();
     }
     
-    void OnEnable() => MatrixSpawner.OnMatrixSpawned += HandleMatrixSpawned;
-    void OnDisable() => MatrixSpawner.OnMatrixSpawned -= HandleMatrixSpawned;
-    void HandleMatrixSpawned(GameObject matrix)
+    void OnEnable() => TensorSpawner.OnTensorSpawned += HandleTensorSpawned;
+    void OnDisable() => TensorSpawner.OnTensorSpawned -= HandleTensorSpawned;
+    void HandleTensorSpawned(GameObject tensor)
     {
-        _matrix = matrix;
-        _maxInnerDimensions = _matrix.transform.childCount;
+        _tensor = tensor;
+        _ySliceCount = tensor.transform.childCount;
     }
 
     private void OnRightPress(InputValue value)
@@ -107,9 +107,9 @@ public class Player : MonoBehaviour
 
     void OnScroll(InputValue value)
     {
-        if (_matrix == null)
+        if (_tensor == null)
         {
-            Debug.Log("Matrix is not initialized yet");
+            Debug.Log("Tensor is not initialized yet");
             return;
         }
         Vector2 scrollDelta = value.Get<Vector2>();
@@ -126,7 +126,7 @@ public class Player : MonoBehaviour
                 _currentRadius--;
             }
 
-            if (scrollDelta.y < _maxInnerDimensions) // TODO: Check if there is a better value to utilize here...?
+            if (scrollDelta.y < _ySliceCount) // TODO: Check if there is a better value to utilize here...?
             {                                       // Might require some significant computation to calculate max radius of sphere from selecetd point
                 _currentRadius++;
             }
@@ -141,7 +141,7 @@ public class Player : MonoBehaviour
         }
         else if (scrollDelta.y < 0)
         {
-            if (_currentLayer < _maxInnerDimensions)
+            if (_currentLayer < _ySliceCount)
             {
                 _currentLayer++;    
                 Debug.Log("Layer increase, value now:" + _currentLayer);
@@ -153,47 +153,50 @@ public class Player : MonoBehaviour
 
     private void ShowLayer(int layer)
     {
-        if (layer == _maxInnerDimensions)
+        if (layer == _ySliceCount)
         {
-            for (int i = 0; i < _maxInnerDimensions; i++)
+            for (int i = 0; i < _ySliceCount; i++)
             {
-                Transform matrixSlice = _matrix.transform.GetChild(i); 
-                ToggleSpheresOnLayer(matrixSlice, false);
+                Transform tensorSlice = _tensor.transform.GetChild(i);
+                ToggleSpheresOnLayer(tensorSlice, false);
             }
         }
 
         else
         {
-            for (int i = 0; i < _maxInnerDimensions; i++)
+            for (int i = 0; i < _ySliceCount; i++)
             {
-                Transform matrixSlice = _matrix.transform.GetChild(i); 
+                Transform tensorSlice = _tensor.transform.GetChild(i);
                 if (i > layer)
                 {
                     // Hide everything above
-                    matrixSlice.gameObject.SetActive(false);
+                    tensorSlice.gameObject.SetActive(false);
                 }
                 
                 else if (i < layer)
                 {
-                    matrixSlice.gameObject.SetActive(true);
-                    ToggleSpheresOnLayer(matrixSlice, false);
+                    tensorSlice.gameObject.SetActive(true);
+                    ToggleSpheresOnLayer(tensorSlice, false);
                 }
                 else
                 {
-                    matrixSlice.gameObject.SetActive(true);
-                    ToggleSpheresOnLayer(matrixSlice, true);
+                    tensorSlice.gameObject.SetActive(true);
+                    ToggleSpheresOnLayer(tensorSlice, true);
                 }
             }
         }
     }
 
-    void ToggleSpheresOnLayer(Transform matrixSlice, bool toggle)
+    void ToggleSpheresOnLayer(Transform tensorSlice, bool toggle)
     {
-        foreach (Transform transformChild in matrixSlice)
+        foreach (Transform transformChildX in tensorSlice)
         {
-            if (transformChild.CompareTag("innerBoundarySphere"))
+            foreach (Transform transformChildZ in transformChildX)
             {
-                transformChild.gameObject.SetActive(toggle);
+                if (transformChildZ.CompareTag("innerBoundarySphere"))
+                {
+                    transformChildZ.gameObject.SetActive(toggle);
+                }
             }
         }
     }
