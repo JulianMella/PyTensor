@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
     private int _ySliceCount;
     private int _currentLayer = 1;
     private bool _leftMouseIsPressed;
-    private bool _radiusMode = false;
+    private bool _radiusMode;
     private int _currentRadius = 0;
     private int _maxRadius;
 
