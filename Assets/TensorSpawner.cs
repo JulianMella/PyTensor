@@ -41,7 +41,7 @@ public class TensorSpawner : MonoBehaviour
         _tensorFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
         _tensorFloor.name = "TensorFloor";
         _tensorFloor.transform.localScale = new Vector3(width * SpacingBetweenSpheres, 2, length * SpacingBetweenSpheres);
-        _tensorFloor.transform.position = new Vector3(((amountOfSpheres.x * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2, -2, ((amountOfSpheres.z * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2);
+        _tensorFloor.transform.position = new Vector3(((amountOfSpheres.x * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2, -1, ((amountOfSpheres.z * SpacingBetweenSpheres) + SpacingBetweenSpheres) / 2);
     }
 
     private void SpawnSphereTensor(uint width, uint length, uint height)
@@ -62,7 +62,7 @@ public class TensorSpawner : MonoBehaviour
                 for (var z = 1; z < length - 1; z++)
                 {
                     var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.transform.position =  new Vector3(x * SpacingBetweenSpheres, (y - 1) * SpacingBetweenSpheres, z * SpacingBetweenSpheres);
+                    sphere.transform.position =  new Vector3(x * SpacingBetweenSpheres, y * SpacingBetweenSpheres, z * SpacingBetweenSpheres);
                     sphere.transform.SetParent(xLayer.transform);
                     sphere.tag = "innerBoundarySphere";
                     sphere.name = "Z Sphere " + z;
