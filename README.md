@@ -18,4 +18,12 @@ This tool has severe performance issues. When initializing a 100x100x100 space, 
 
 To fix this, I will create a new repo with a GPU instanced based solution called PyTensor-GPUInstanced soon.
 
-TODO: Change naming from Matrix to Tensor where appropriate within the scripting code. I did an oopsie and did not think about proper terminology within the code before it was too late. So now I have to go and refactor a bunch, which honestly i cant be bothered with right now since this is not the final solution anyways.
+REFACTOR-TODO: Boundary terminology is not correctly used. \
+
+---
+#### Reflections on how programming this has been
+---
+
+I have been watching vlogs of people complaining how long it takes to implement different stuff in the game. I get it, it takes time to some extent, but I think there are many ways to solve that feeling.
+
+This task has been one which has required me to consistently pour code from my fingertips, deep thinking, research, understanding, visualization. Such a work methodology requires to work fast, many thoughts are occurring, you need to research different branches of knowledge and understanding, go back and forth between them, so you need to do it quick to keep up. Luckily, I have 135wpm average (thanks 2007 varrock trading). On the downside, messy ideas can sometimes be put in place and long nested restructuring, refactoring, and such is required. At times, you just need to take a decision and go with it. There are many edge cases to think about which can hinder you strongly if you sometimes don't decide to skip them! Refactoring is a good skill to learn anyways. 
