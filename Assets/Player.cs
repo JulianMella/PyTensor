@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
     private int _currentLayer = 1;
     private bool _leftMouseIsPressed;
     private bool _radiusMode = false;
+    private int _currentRadius = 0;
+    private int _maxRadius;
 
     private int _objectSelected;
 
@@ -111,7 +113,24 @@ public class Player : MonoBehaviour
             return;
         }
         Vector2 scrollDelta = value.Get<Vector2>();
+        if (_radiusMode)
+        {
+            if (_radiusSphere == null)
+            {
+                Debug.Log("Radius sphere is not selected yet");
+                return;
+            }
 
+            if (scrollDelta.y > 0)
+            {
+                _currentRadius--;
+            }
+
+            if (scrollDelta.y < _maxInnerDimensions) // TODO: Check if there is a better value to utilize here...?
+            {                                       // Might require some significant computation to calculate max radius of sphere from selecetd point
+                _currentRadius++;
+            }
+        }
         if (scrollDelta.y > 0)
         {
             if (_currentLayer > 0)
