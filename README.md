@@ -18,7 +18,6 @@ This tool has severe performance issues. When initializing a 100x100x100 space, 
 
 To fix this, I will create a new repo with a GPU instanced based solution called PyTensor-GPUInstanced soon.
 
-REFACTOR-TODO: Boundary terminology is not correctly used. \
 
 ---
 #### Reflections on how programming this has been
