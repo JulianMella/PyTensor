@@ -6,7 +6,7 @@ TagManager:
   tags:
   - innerBoundarySphere
   - innerBoundaryCube
-  - sphereTag
+  - radiusSphere
   layers:
   - Default
   - TransparentFX
