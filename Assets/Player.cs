@@ -127,7 +127,7 @@ public class Player : MonoBehaviour
             }
 
             if (scrollDelta.y < _ySliceCount) // TODO: Check if there is a better value to utilize here...?
-            {                                       // Might require some significant computation to calculate max radius of sphere from selecetd point
+            {                                       // Might require some significant computation to calculate max radius of sphere from selected point
                 _currentRadius++;
             }
         }
@@ -281,14 +281,7 @@ public class Player : MonoBehaviour
 
     private void SetHighlight(Transform objectHit, bool radiusMode)
     {
-        if (radiusMode)
-        {
-            objectHit.GetComponent<Renderer>().material = radiusModeHighlightMat;
-        }
-        else
-        {
-            objectHit.GetComponent<Renderer>().material = highlightMat;
-        }
+        objectHit.GetComponent<Renderer>().material = radiusMode ? radiusModeHighlightMat :  highlightMat;
     }
 
     private void HandleMovement(float deltaTime)
