@@ -459,7 +459,6 @@ public class Player : MonoBehaviour
         CalculateMaxRadius(_radiusSphere);
         UpdateRadiusSpherePosition();
         ShowAllObstacles();
-        ChangeScrollLogic();
     }
 
     private void CalculateMaxRadius(Transform selectedSphere)
@@ -485,11 +484,6 @@ public class Player : MonoBehaviour
     }
     
     private void ShowAllObstacles()
-    {
-        
-    }
-
-    private void ChangeScrollLogic()
     {
         
     }
