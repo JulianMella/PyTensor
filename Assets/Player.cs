@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -41,6 +42,9 @@ public class Player : MonoBehaviour
     private Ray _ray;
 
     private GameObject _tensor;
+    private GameObject _voxelHSphere;
+
+    private readonly string _cwd = Directory.GetCurrentDirectory();
 
     [SerializeField] private Camera cam;
     [Header("Sphere Hover Color Settings")]
@@ -172,10 +176,15 @@ public class Player : MonoBehaviour
                 _currentRadius--;
             }
 
-            if (scrollDelta.y < _maxRadius)
+            if (scrollDelta.y < 0)
             {
-                _currentRadius++;
+                if (_currentRadius < _maxRadius)
+                {
+                    _currentRadius++;
+                }
             }
+
+            ShowHollowVoxelSphere(_currentRadius);
         }
         else
         {
@@ -236,6 +245,59 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void ShowHollowVoxelSphere(int radius)
+    {
+        if (_voxelHSphere != null)
+        {
+            Destroy(_voxelHSphere);
+        }
+        
+        if (radius <= 0 || radius > _maxRadius)
+        {
+            return;
+        }
+
+        _voxelHSphere = new GameObject("Hollow Voxel Sphere");
+
+        string filePath = _cwd + "/Assets/SphereCoordinates/Sphere" + radius + ".txt";
+        string[] split;
+        float xCoord;
+        float yCoord;
+        float zCoord;
+        
+        if (File.Exists(filePath))
+        {
+            foreach (string line in File.ReadLines(filePath))
+            {
+                split = line.Split(' ');
+                // I think there are minor optimizations which could be done here to
+                // improve amount of clock cycles for invalid positions
+                
+                xCoord = (float.Parse(split[0]) * 1.5f) + _radiusSphere.transform.position.x;
+                yCoord = (float.Parse(split[1]) * 1.5f) +  _radiusSphere.transform.position.y;
+                zCoord = (float.Parse(split[2]) * 1.5f) +  _radiusSphere.transform.position.z;
+
+                // Referring to the last comment:
+                // I think it should be possible to compare with the parsed values only if its a valid position
+                // and only after that the value is multiplied and summed with the position of radiusSphere.
+                if (xCoord < 1.5f || yCoord < 1.5f || zCoord < 1.5f)
+                {
+                    continue;
+                }
+
+                if (xCoord > _xSliceCount * 1.5f || yCoord > _ySliceCount * 1.5f || zCoord > _zSliceCount * 1.5f)
+                {
+                    continue;
+                }
+                
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.transform.position =  new Vector3(xCoord, yCoord, zCoord);
+                cube.transform.SetParent(_voxelHSphere.transform);
+            }
+        }
+
+    }
+    
     void ToggleSpheresOnLayer(Transform tensorSlice, bool toggle)
     {
         foreach (Transform transformChildX in tensorSlice)
