@@ -33,4 +33,4 @@ This task has been one which has required me to consistently pour code from my f
 
 ---
 ###### note on git usage style
-I am implementing things on an iterative way with hunks, so only main branch exists, but things are atomically pushed, so it should be fine :D 
+I am implementing things on an iterative way with git hunks, so only main branch exists, but features, fixes and such are atomically pushed, so it should be fine :D 
