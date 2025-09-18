@@ -448,6 +448,7 @@ public class Player : MonoBehaviour
         _radiusSphere = hit.transform;
         
         CalculateMaxRadius(_radiusSphere);
+        UpdateRadiusSpherePosition();
         ShowAllObstacles();
         ChangeScrollLogic();
     }
@@ -462,6 +463,16 @@ public class Player : MonoBehaviour
         int zNeg = _zSliceCount - zPos - 1;
         
         _maxRadius = Mathf.Max(xPos, xNeg, yPos, yNeg, zPos, zNeg);
+    }
+
+    private void UpdateRadiusSpherePosition()
+    {
+        if (_currentRadius > _maxRadius)
+        {
+            _currentRadius = _maxRadius;
+        }
+
+        ShowHollowVoxelSphere(_currentRadius);
     }
     
     private void ShowAllObstacles()
