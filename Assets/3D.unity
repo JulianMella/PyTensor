@@ -425,6 +425,7 @@ MonoBehaviour:
   defaultMat: {fileID: 2100000, guid: a0e65a69bfd9b439eae864bedd25b585, type: 2}
   highlightMat: {fileID: 2100000, guid: 8a1a9e15e835d47ccb88a9ab8fc423ee, type: 2}
   radiusModeHighlightMat: {fileID: 2100000, guid: ce42b6119081041109326bb867dc8026, type: 2}
+  voxelMat: {fileID: 2100000, guid: 2abd4b3e43aca449d8ec41c49ed4a610, type: 2}
 --- !u!1 &1277199560
 GameObject:
   m_ObjectHideFlags: 0

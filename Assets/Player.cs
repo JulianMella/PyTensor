@@ -51,6 +51,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Material defaultMat;
     [SerializeField] private Material highlightMat;
     [SerializeField] private Material radiusModeHighlightMat;
+    [SerializeField] private Material voxelMat;
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -293,6 +294,7 @@ public class Player : MonoBehaviour
                 var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.transform.position =  new Vector3(xCoord, yCoord, zCoord);
                 cube.transform.SetParent(_voxelHSphere.transform);
+                cube.tag = "voxelSphereObject";
             }
         }
 
@@ -364,13 +366,20 @@ public class Player : MonoBehaviour
 
                 if (_hit.transform.CompareTag("innerBoundarySphere"))
                 {
-                    SetHighlight(_objectHit, _radiusMode);
+                    Material mat = _radiusMode ? radiusModeHighlightMat : highlightMat;
+                    SetHighlight(_objectHit, mat);
                 }
 
                 if (_hit.transform.CompareTag("innerBoundaryCube") && !_radiusMode)
                 {
-                    SetHighlight(_objectHit, false);
+                    SetHighlight(_objectHit, highlightMat);
                 }
+            }
+
+            if (_hit.transform.CompareTag("voxelSphereObject"))
+            {
+                _objectHit = _hit.transform;
+                SetHighlight(_objectHit, voxelMat);
             }
 
         }
@@ -394,9 +403,9 @@ public class Player : MonoBehaviour
         objectHit.GetComponent<Renderer>().material = defaultMat;
     }
 
-    private void SetHighlight(Transform objectHit, bool radiusMode)
+    private void SetHighlight(Transform objectHit, Material material)
     {
-        objectHit.GetComponent<Renderer>().material = radiusMode ? radiusModeHighlightMat :  highlightMat;
+        objectHit.GetComponent<Renderer>().material = material;
     }
 
     private void HandleMovement(float deltaTime)
