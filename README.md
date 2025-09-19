@@ -5,15 +5,50 @@
 
 3 Dimensional Extension of [PyMatrix](https://github.com/julianmella/PyMatrix)
 
-This tool gives you a user interface under Window -> UI Toolkit -> PyTensor, which when utilized, creates a 3D tensor.
+## How to use this tool
 
-The tensor consists of spheres. The spheres are clickable, if clicked it turns into a cube which marks it as an obstacle within the course.
+You need [Unity](https://unity.com/products/unity-engine)
 
-Since the tensor can be very large, the scroll wheel has functionality to work on an individual layer basis such that only spheres for one layer are shown, whilst everything above is hidden and every layer below only shows the obstacles.
+Once downloaded, open the project.
 
-Once satisfied with the results, go back to the PyTensor UI, select the path where you want to store the Tensor data, give it a file name (without .py or any file extension at the end) and press the "Export to python set" button.
+Start Play Mode
 
-Keep in mind that the python file that is generated is only a set of all the cubes wthin the boundaries and not the boundaries themselves. This design choice was due to the use case for a University Exam I have.
+Go to Window -> UI Toolkit -> PyTensor.
+
+Select the dimensions you want (Note: This generates a cube where the outer walls are invisible.)
+
+Generate it.
+
+## Adding obstacles
+
+Scroll to view different Y-level slices.
+
+Left click to add or remove obstacle (Can hold too).
+
+## Adding start and end points
+Right click to select radius mode
+
+Select origo by left clicking any sphere. (Start point)
+
+Scroll to generate a hollow voxel sphere.
+
+Left click any to mark an end point.
+
+### Why select end points this way?
+Such that all end points are equidistant from origo and results in some fairness for path finding algorithms
+
+
+## Storing data
+Select a save path in UI
+
+Write name (without .py extension)
+
+Export.
+
+
+
+## Notes
+Keep in mind that the python file that is generated is only a set of all the cubes within the boundaries and not the boundaries themselves. This design choice was due to the use case for a University Exam I have.
 
 Bugs are to be expected.
 
@@ -21,6 +56,12 @@ This tool has severe performance issues. When initializing a 100x100x100 space, 
 
 To fix this, I will create a new repo with a GPU instanced based solution called PyTensor-GPUInstanced soon.
 
+### About Assets/SphereCoordinates
 ---
-###### note on git usage style
+A slight drawback that is immediately noticeable is the size of this project. The SphereCoordinates directory is the main reason for that. The Radius mode tool required a precise calculation of a hollow sphere, and my weak maths didn’t let me visualize the solution. I circumvented the issue by quickly vibe coding the [VoxelSphereHollow](https://github.com/JulianMella/VoxelSphereHollow) tool. It generates the outer coordinates of a perfect voxel sphere with values normalized to origo.
+
+Either way, I found out that WorldEdit is open source and I extracted the algorithm they utilize. If I ever implement it, it would be interesting to profile the performance of both solutions.
+
+---
+###### git usage style
 I am implementing things on an iterative way with git hunks, so only main branch exists, but features, fixes and such are atomically pushed, so it should be fine :D 
