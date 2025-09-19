@@ -1,6 +1,7 @@
 # PyTensor - Unity based tool to create a 3 dimensional space with obstacles
 <p align="center">
   <img src="https://github.com/JulianMella/PyTensor/blob/main/Scene.png?raw=true" width="200" height="200">
+  <img src="https://github.com/JulianMella/PyTensor/blob/main/Scene2.png?raw=true" width="200" height="200">
 </p>
 
 3 Dimensional Extension of [PyMatrix](https://github.com/julianmella/PyMatrix)
