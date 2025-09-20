@@ -55,7 +55,10 @@ public class TensorSpawner : MonoBehaviour
         for (var y = 1; y < height - 1; y++)
         {
             var yLayer = new GameObject("Y Tensor Layer " + y);
-       
+            if (y != 1)
+            {
+                yLayer.SetActive(false);
+            }
             for (var x = 1; x < width - 1; x++)
             {
                 var xLayer = new GameObject("X Tensor Layer " + x);
@@ -64,6 +67,7 @@ public class TensorSpawner : MonoBehaviour
                     var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     sphere.transform.position =  new Vector3(x * SpacingBetweenSpheres, y * SpacingBetweenSpheres, z * SpacingBetweenSpheres);
                     sphere.transform.SetParent(xLayer.transform);
+                    sphere.transform.GetComponent<Renderer>().material = Player.DefaultSphereMat;
                     sphere.tag = "innerBoundarySphere";
                     sphere.name = "Z Sphere " + z;
                 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -43,15 +44,20 @@ public class Player : MonoBehaviour
 
     private GameObject _tensor;
     private GameObject _voxelHSphere;
+    
+    public static HashSet<Vector3> obstacles = new HashSet<Vector3>();
 
     private readonly string _cwd = Directory.GetCurrentDirectory();
 
     [SerializeField] private Camera cam;
     [Header("Sphere Hover Color Settings")]
-    [SerializeField] private Material defaultMat;
+    public static Material DefaultSphereMat;
+    [SerializeField] private Material defaultSphereMat;
+    [SerializeField] private Material defaultCubeMat;
     [SerializeField] private Material highlightMat;
     [SerializeField] private Material radiusModeHighlightMat;
-    [SerializeField] private Material voxelMat;
+    [SerializeField] private Material sphereVoxelHoverMat;
+    [SerializeField] private Material sphereVoxelDefaultMat;
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -61,6 +67,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         UpdateScreenCenter(); // This must be called in Start because it depends on Screen.width and Screen.height, which is not guaranteed to be initialized in Awake()
+        DefaultSphereMat = defaultSphereMat;
     }
 
     private void UpdateScreenCenter()
@@ -210,9 +217,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void ShowLayer(int layer)
+    private void ShowLayer(int currentLayer)
     {
-        if (layer == _ySliceCount)
+        if (currentLayer == _ySliceCount)
         {
             for (int i = 0; i < _ySliceCount; i++)
             {
@@ -226,21 +233,15 @@ public class Player : MonoBehaviour
             for (int i = 0; i < _ySliceCount; i++)
             {
                 Transform tensorSlice = _tensor.transform.GetChild(i);
-                if (i > layer)
-                {
-                    // Hide everything above
-                    tensorSlice.gameObject.SetActive(false);
-                }
-                
-                else if (i < layer)
+                if (i == currentLayer)
                 {
                     tensorSlice.gameObject.SetActive(true);
-                    ToggleSpheresOnLayer(tensorSlice, false);
+                    ToggleSpheresOnLayer(tensorSlice, true);
                 }
                 else
                 {
                     tensorSlice.gameObject.SetActive(true);
-                    ToggleSpheresOnLayer(tensorSlice, true);
+                    ToggleSpheresOnLayer(tensorSlice, false);
                 }
             }
         }
@@ -277,9 +278,10 @@ public class Player : MonoBehaviour
                 xCoord = (float.Parse(split[0]) * 1.5f) + _radiusSphere.transform.position.x;
                 yCoord = (float.Parse(split[1]) * 1.5f) +  _radiusSphere.transform.position.y;
                 zCoord = (float.Parse(split[2]) * 1.5f) +  _radiusSphere.transform.position.z;
-
-                // Referring to the last comment:
-                // I think it should be possible to compare with the parsed values only if its a valid position
+               
+                
+                // Referring to the last comment:                                            \/
+                // I think it should be possible to compare with the parsed values only if it's a valid position
                 // and only after that the value is multiplied and summed with the position of radiusSphere.
                 if (xCoord < 1.5f || yCoord < 1.5f || zCoord < 1.5f)
                 {
@@ -293,6 +295,7 @@ public class Player : MonoBehaviour
                 
                 var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.transform.position =  new Vector3(xCoord, yCoord, zCoord);
+                cube.transform.GetComponent<Renderer>().material = sphereVoxelDefaultMat;
                 cube.transform.SetParent(_voxelHSphere.transform);
                 cube.tag = "voxelSphereObject";
             }
@@ -352,12 +355,23 @@ public class Player : MonoBehaviour
         {
             if (_objectHit != null && _objectHit != _hit.transform)
             {
-                ResetColor(_objectHit);
+                switch (_objectHit.tag)
+                {
+                    case "voxelSphereObject": 
+                        ResetColor(_objectHit, sphereVoxelDefaultMat);
+                        break;
+                    case "innerBoundaryCube":
+                        ResetColor(_objectHit, defaultCubeMat);
+                        break;
+                    default:
+                        ResetColor(_objectHit, defaultSphereMat);
+                        break;
+                }
             }
 
             if (_hit.transform.CompareTag("innerBoundaryCube") && _radiusMode)
             {
-                ResetColor(_hit.transform);
+                ResetColor(_hit.transform, defaultCubeMat);
             }
     
             if (_hit.transform.CompareTag("innerBoundarySphere") || _hit.transform.CompareTag("innerBoundaryCube"))
@@ -379,7 +393,7 @@ public class Player : MonoBehaviour
             if (_hit.transform.CompareTag("voxelSphereObject"))
             {
                 _objectHit = _hit.transform;
-                SetHighlight(_objectHit, voxelMat);
+                SetHighlight(_objectHit, sphereVoxelHoverMat);
             }
 
         }
@@ -388,19 +402,30 @@ public class Player : MonoBehaviour
         {
             if (_objectHit != null)
             {
-                ResetColor(_objectHit);
+                switch (_objectHit.tag)
+                {
+                    case "voxelSphereObject": 
+                        ResetColor(_objectHit, sphereVoxelDefaultMat);
+                        break;
+                    case "innerBoundaryCube":
+                        ResetColor(_objectHit, defaultCubeMat);
+                        break;
+                    default:
+                        ResetColor(_objectHit, defaultSphereMat);
+                        break;
+                }
                 _objectHit = null;
             }
         }
     }
 
-    private void ResetColor(Transform objectHit)
+    private void ResetColor(Transform objectHit, Material newMat)
     {
         if (_radiusMode && objectHit.GetComponent<Renderer>().sharedMaterial == radiusModeHighlightMat && objectHit.transform.CompareTag("radiusSphere"))
         {
             return;
         }
-        objectHit.GetComponent<Renderer>().material = defaultMat;
+        objectHit.GetComponent<Renderer>().material = newMat;
     }
 
     private void SetHighlight(Transform objectHit, Material material)
@@ -418,11 +443,31 @@ public class Player : MonoBehaviour
         }
     }
 
+    //private int _amount_of_count; //TODO: Make rider use snake_case. 
+    //private float _count;
+    
+    private Vector3 _rotation;   // (pitch, yaw, roll)
+    public float rollSpeed = 50f;
+    public float pitchSpeed = 50f;
+    public float yawSpeed = 30f;
     private void HandleRotation()
     {
         _currentRotation += _rotationInput * lookSensitivity;
-        _currentRotation.y = Mathf.Clamp(_currentRotation.y, -90f, 90f); // prevent flipping
-        transform.rotation = Quaternion.Euler(-_currentRotation.y, _currentRotation.x, 0);
+        transform.rotation = Quaternion.Euler(-_currentRotation.y,_currentRotation.x, 0);
+        /* Mouse look (pitch + yaw)
+        float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
+
+        _rotation.x -= mouseY * pitchSpeed * Time.deltaTime; // pitch
+        _rotation.y += mouseX * yawSpeed * Time.deltaTime;   // yaw
+
+        // Roll (A/D for balance)
+        if (Input.GetKey(KeyCode.A)) _rotation.z += rollSpeed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.D)) _rotation.z -= rollSpeed * Time.deltaTime;
+
+        // Apply rotation
+        transform.rotation = Quaternion.Euler(_rotation);
+        */
     }
 
     private void ShootRay()
@@ -447,7 +492,7 @@ public class Player : MonoBehaviour
     {
         if (_radiusSphere != null && hit.transform != _radiusSphere)
         {
-            _radiusSphere.GetComponent<Renderer>().material = defaultMat;
+            _radiusSphere.GetComponent<Renderer>().material = defaultSphereMat;
             _radiusSphere.tag = "innerBoundarySphere";
         }
         
@@ -500,6 +545,7 @@ public class Player : MonoBehaviour
         if (_objectSelected == SphereSelected && hit.transform.CompareTag("innerBoundarySphere"))
         {
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.GetComponent<Renderer>().material = defaultCubeMat;
             cube.transform.position = hit.transform.position;
             cube.transform.rotation = hit.transform.rotation;
             cube.transform.parent = hit.transform.parent;
@@ -511,6 +557,7 @@ public class Player : MonoBehaviour
         else if (_objectSelected == CubeSelected && _hit.transform.CompareTag("innerBoundaryCube"))
         {
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.GetComponent<Renderer>().sharedMaterial = defaultSphereMat;
             sphere.transform.position = hit.transform.position;
             sphere.transform.rotation = hit.transform.rotation;
             sphere.transform.parent = hit.transform.parent;
