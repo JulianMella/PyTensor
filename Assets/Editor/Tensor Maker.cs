@@ -17,6 +17,7 @@ public class PyTensor : EditorWindow
     private const uint MinDimensionValue = TensorConstants.MinDimensionValue;
     private string _path = "";
     private string _filename = "";
+    private string _startendfilename = "";
     private GameObject _innerBoundaries = null;
 
     public string Path
@@ -127,6 +128,40 @@ public class PyTensor : EditorWindow
         exportToPythonSet.SetEnabled(false);
         root.Add(exportToPythonSet);
         
+        var spacer2 = new VisualElement
+        {
+            style =
+            {
+                height = 20
+            }
+        };
+        root.Add(spacer2);
+
+        var selectStartEndPointPath = new Button()
+        {
+            name = "selectStartEndPointPath",
+            text = "Select start- and endpoint path for storage"
+        };
+        root.Add(selectStartEndPointPath);
+
+        var startEndFileName = new TextField()
+        {
+            name = "startEndFileName",
+            label = "Enter start endpoint filename:"
+        };
+        
+        startEndFileName.RegisterValueChangedCallback((v) =>
+        {
+            _startendfilename = v.newValue + ".py";
+        });
+        root.Add(startEndFileName);
+
+        var exportStartEndToPython = new Button()
+        {
+            name = "exportStartEndToPython",
+            text = "Export to Python set"
+        };
+        root.Add(exportStartEndToPython);
         SetupButtonHandler();
     }
 
